@@ -51,8 +51,10 @@ def convert_time(time_):
 def parse_parameters(parameters):
     """Parse job parameters into SGE command options"""
     options = []
-    if 'cores' in parameters:
-        options.append('-pe {} {}'.format(parameters['pevn'], parameters['cores']))  # Cores per task
+    if 'cores' in parameters and 'penv' in parameters:
+        options.append('-pe {} {}'.format(parameters['pevn'], parameters['cores']))
+    elif 'cores' in parameters:
+        options.append('-l slots={}'.format(parameters['cores']))
     if 'memory' in parameters:
         # TODO SGE engine uses memory per core
         options.append('-l h_vmem={}'.format(parameters['memory']))  # Memory pool for all cores (see also --mem-per-cpu)

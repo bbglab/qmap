@@ -17,14 +17,14 @@ Parameters
 
 Accepted parameters for a job and its conversion into SGE parameters:
 
-- cores: -pe
-- penv: option for -pe
-- memory : -l h_vmem=
-- queue: -q
-- time: -l h_rt=
-- tasks: -n
-- working_directory: -wd
-- name: -N
+- cores: ``-pe`` if penv is passed, otherwise ``-l slots=``
+- penv: option for `-pe``
+- memory : ``-l h_vmem=``
+- queue: ``-q``
+- time: ``-l h_rt=``
+- tasks: ``-n``
+- working_directory: ``-wd``
+- name: ``-N``
 
 .. important:: configure the appropiate ``penv`` option in your
    :ref:`profile file <profile>`.
