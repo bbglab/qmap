@@ -1,0 +1,5 @@
+{
+    "retries": 0,
+    "command": "sleepy 22 && echo world",
+    "status": "FAILED"
+}

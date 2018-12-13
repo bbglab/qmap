@@ -1,0 +1,1 @@
+# Empty confspec as validation is done in the profile itself

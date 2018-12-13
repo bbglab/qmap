@@ -1,0 +1,2 @@
+pytest      # for running the test
+sphinx      # for building the documentation

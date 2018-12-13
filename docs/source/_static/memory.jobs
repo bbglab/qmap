@@ -1,0 +1,9 @@
+[pre]
+module load anaconda3/4.4.0
+
+[params]
+memory=8G
+
+[jobs]
+python memory.py 8
+python memory.py 10 ## memory=10G

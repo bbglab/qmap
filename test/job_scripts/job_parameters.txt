@@ -1,0 +1,8 @@
+[params]
+cores = 27
+memory = 5
+
+[jobs]
+sleep 22 && echo hello
+sleep 22 && echo world  ## cores=6 queue=myq
+sleep 22 && echo bye

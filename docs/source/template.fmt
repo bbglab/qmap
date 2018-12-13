@@ -1,0 +1,22 @@
+
+[pre]
+pre-command 1
+pre-command 2
+...
+pre-command l
+
+[post]
+post-command 1
+post-command 2
+...
+post-command n
+
+[params]
+job parameters
+
+[jobs]
+job 1
+job 2  ## job specific parameters
+...
+job m
+

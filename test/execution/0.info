@@ -1,0 +1,5 @@
+{
+    "retries": 0,
+    "command": "sleep 22 && echo hello",
+    "status": "COMPLETED"
+}
