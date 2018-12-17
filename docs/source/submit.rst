@@ -59,7 +59,7 @@ that are special:
 
 One of the features of |qm| is that you can access the parameters of the
 job from your job command.
-E.g. Using :command:`bgqmap submit --cores 5 jobs.map`` you can
+E.g. Using :command:`qmap submit --cores 5 jobs.map`` you can
 have a :file:`jobs.map` file with commands like::
 
    python parallel1.py --cores ${QMAP_CORES}

@@ -1,10 +1,10 @@
-.. BgQmap documentation master file, created by
+.. QMap documentation master file, created by
    sphinx-quickstart on Mon Sep  4 09:07:33 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to BgQmap's documentation!
-==================================
+Welcome to QMap's documentation!
+================================
 
 
 .. toctree::
