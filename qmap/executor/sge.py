@@ -52,7 +52,7 @@ def parse_parameters(parameters):
     """Parse job parameters into SGE command options"""
     options = []
     if 'cores' in parameters and 'penv' in parameters:
-        options.append('-pe {} {}'.format(parameters['pevn'], parameters['cores']))
+        options.append('-pe {} {}'.format(parameters['penv'], parameters['cores']))
     elif 'cores' in parameters:
         options.append('-l slots={}'.format(parameters['cores']))
     if 'memory' in parameters:
@@ -207,7 +207,8 @@ class Executor(IExecutor):
     @staticmethod
     def run(cmd, parameters, quiet=False):
         options = parse_parameters(parameters)
-        command = 'qrsh {0} bash --noprofile --norc -c "{1}"'.format(' '.join(options), cmd)
+        command = 'qrsh {0} bash --noprofile --norc -c "{1}"'.format(' '.join(options), cmd)  # TODO preserve
+        # environment
         p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
         job_id = None
         while True:
