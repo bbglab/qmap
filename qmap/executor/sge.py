@@ -22,7 +22,7 @@ QSTAT_STATUS_CONVERSION = {Status.DONE: [],
 QSTAT_STATUS = {}
 for k, v in QSTAT_STATUS_CONVERSION.items():
     for i in v:
-        QSTAT_STATUS_CONVERSION[i] = k
+        QSTAT_STATUS[i] = k
 
 
 SCRIPT_FILE_EXTENSION = 'sh'
@@ -113,6 +113,8 @@ class Executor(IExecutor):
                         error = ExecutorErrorCodes.UNKNOWN if status == Status.FAILED else ExecutorErrorCodes.NOERROR
                         done.add(id_)
                         yield id_, (status, error, info)
+        for id_ in done:
+            job_ids.remove(id_)
 
     @staticmethod
     def generate_job_status_finished(job_ids, retries=3):
