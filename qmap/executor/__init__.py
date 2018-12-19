@@ -61,6 +61,9 @@ def load(executor_, show_usage=False):
     elif executor_ == 'sge':
         from qmap.executor import sge
         _Executor = sge.Executor
+    elif executor_ == 'lsf':
+        from qmap.executor import lsf
+        _Executor = lsf.Executor
     else:
         raise ExecutorError('Executor {} not found'.format(executor_))
     if not show_usage:  # override the get usage function with an empty one
