@@ -45,9 +45,11 @@ Tools
 
    The job commands are all the combinations that result of the expansion of:
 
-   :{{list,of,items}}: comma separated list of items
-   :{{file}}: all lines in file
-   :`*`, ?, [x-y]: wildcards in Python's glob module
+   ==================== ===================================
+   {{list,of,items}}    comma separated list of items
+   {{file}}             all lines in file
+   `*`, ?, [x-y]        wildcards in Python's glob module
+   ==================== ===================================
 
    Wildcards of the format ``{{...}}`` are expanded in a first phase
    and glob wildcards are expanded later on.
@@ -95,9 +97,10 @@ Tools
    are substituted before execution. Those values represent the job parameters
    and additionally, a unique identifier for each job.
 
-   :${BGQMAP_LINE}: identifier of the line the job command has in the input file
-   :${BGQMAP_CORES}: cores for the execution
-
+   ======================== ============================================================
+   ${BGQMAP_LINE}           identifier of the line the job command has in the input file
+   ${BGQMAP_CORES}          cores for the execution
+   ======================== =============================================================
 
 
 
