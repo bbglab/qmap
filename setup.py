@@ -17,7 +17,7 @@ setup(
     description='Manage job executions in a cluster',
     long_description=long_description,
     long_description_content_type='text/x-rst',
-    # url="",
+    url="https://github.com/bbglab/qmap",
     author="Barcelona Biomedical Genomics Lab",
     author_email="bbglab@irbbarcelona.org",
     license="Apache Software License 2.0",
