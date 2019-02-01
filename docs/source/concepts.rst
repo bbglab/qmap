@@ -21,6 +21,7 @@ Currently, only 4 executors are implemented:
 - **local**: executor that uses ``bash`` on Linux systems.
 - **slurm**: executor for SLURM.
 - **sge**: executor for SGE.
+- **lsf**: executor for Platform LSF.
 
 To select the executor you want to use read about the :ref:`profile <profile>`.
 

@@ -11,3 +11,4 @@ Executors
    local
    slurm
    sge
+   lsf

@@ -5,7 +5,7 @@ QMap
 **QMap** is a tool aimed to run a collection of similar jobs quickly and
 easily in parallel.
 It can run standalone or using different HPC schedulers (Slurm, Sun Grid
-Engine...).
+Engine and LFS).
 
 **QMap** contains 5 different tools:
 
@@ -21,6 +21,8 @@ Engine...).
    ``shell=True`` which can lead to shell injections vulnerabilities.
    More details in https://docs.python.org/3/library/subprocess.html#security-considerations
 
+
+Documentation in: https://qmap.readthedocs.io/en/latest/
 
 Tools
 -----
