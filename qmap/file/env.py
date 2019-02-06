@@ -29,7 +29,7 @@ def save(filename, variables):
         with open(file, 'wt') as fd:
             for k, v in variables.items():
                 fd.write('#{}={}\n'.format(k, v))
-                fd.write('export BGQMAP_{}="{}"'.format(k.upper(), v))
+                fd.write('export QMAP_{}="{}"\n'.format(k.upper(), v))
     except OSError as e:
         raise QMapError(str(e))
 

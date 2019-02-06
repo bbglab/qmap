@@ -13,7 +13,7 @@ from qmap.globals import QMapError
 
 def exception_formatter(exception_type, exception, traceback, others_hook=sys.excepthook):
     """
-    Reduce verbosity of error messages associated with BgQmapErrors
+    Reduce verbosity of error messages associated with QMapErrors
 
     Args:
         exception_type:

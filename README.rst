@@ -97,8 +97,8 @@ Tools
    are substituted before execution. Those values represent the job parameters
    and additionally, a unique identifier for each job.
 
-   :${BGQMAP_LINE}: identifier of the line the job command has in the input file
-   :${BGQMAP_CORES}: cores for the execution
+   :${QMAP_LINE}: identifier of the line the job command has in the input file
+   :${QMAP_CORES}: cores for the execution
 
 
 
