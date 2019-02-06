@@ -72,7 +72,7 @@ PALETTE = [
     ('warning msg', 'yellow', 'black'),
     ('editbx','black','light gray', 'standout'),
     ('stdout', 'white', 'black'),
-    ('stderr', 'dark red', 'black'),
+    ('stderr', 'dark red', 'white'),
     ('retried job', 'white', 'dark red', 'standout'),
     ('retried job select', 'dark red', 'light cyan'),
     ('folder', 'light green', 'black'),
@@ -248,6 +248,7 @@ class JobWidget(BaseTimedWidgetWrap):
 
         self.info_widgets_list = []  # (sub)widget containing the job information
         self.file_widgets_list = []  # (sub)widget containing the last lines of certain files
+        self.metadata_widgets_list = []  # (sub)widget containing the job information from the metadata
         self.update_info()  # read job info
 
         self.handler = WeakMethod(self.update_info)
@@ -298,19 +299,20 @@ class JobWidget(BaseTimedWidgetWrap):
             self.info_widgets_list.append(create_button('Kill', self.terminate))
             self.info_widgets_list.append(urwid.Divider('-'))
 
-        self.info_widgets_list.append(urwid.Text('Retries: {}'.format(self.job.retries)))
-        self.info_widgets_list.append(urwid.Divider())
+        self.metadata_widgets_list = []
+        self.metadata_widgets_list.append(urwid.Text('Retries: {}'.format(self.job.retries)))
+        self.metadata_widgets_list.append(urwid.Divider())
         # Add resources requested by the job
         requested_resources = 'Specific requested resources:\n'
         requested_resources += '  '+str(self.job.params).replace('\n', '\n  ')
-        self.info_widgets_list.append(urwid.Text(requested_resources))
+        self.metadata_widgets_list.append(urwid.Text(requested_resources))
 
         # If usage information is available, display it
         if 'usage' in self.job.metadata:
-            self.info_widgets_list.append(urwid.Divider())
+            self.metadata_widgets_list.append(urwid.Divider())
             used_resources = 'Used resources:\n'
             used_resources += "\n".join(["  {} = {}".format(k, v) for k, v in self.job.metadata['usage'].items()])
-            self.info_widgets_list.append(urwid.Text(used_resources))
+            self.metadata_widgets_list.append(urwid.Text(used_resources))
 
         self.file_widgets_list = []  # Reset files widget
         # Create widget with the files if the job has failed
@@ -318,12 +320,12 @@ class JobWidget(BaseTimedWidgetWrap):
             # Generate wigets with stdout and stderr if available. Done here because Failed state is "absolute"=
             stdout_widget = self._load_file_as_widget(self.job.f_stdout, 'stdout')
             if stdout_widget is not None:
-                self.file_widgets_list.append(urwid.Divider('*'))
                 self.file_widgets_list.append(stdout_widget)
+                self.file_widgets_list.append(urwid.Divider('*'))
             stderr_widget = self._load_file_as_widget(self.job.f_stderr, 'stderr')
             if stderr_widget is not None:
-                self.file_widgets_list.append(urwid.Divider('*'))
                 self.file_widgets_list.append(stderr_widget)
+                self.file_widgets_list.append(urwid.Divider('*'))
 
     def resubmit(self, **kwargs):
         """
@@ -354,8 +356,8 @@ class JobWidget(BaseTimedWidgetWrap):
             # Show stdout of running jobs
             stdout_widget = self._load_file_as_widget(self.job.f_stdout, 'stdout')
             if stdout_widget is not None:
-                self.file_widgets_list = [urwid.Pile([urwid.Divider('*'), stdout_widget])]
-        self.widget.original_widget = urwid.Pile(self.info_widgets_list + self.file_widgets_list)
+                self.file_widgets_list = [urwid.Pile([stdout_widget, urwid.Divider('*')])]
+        self.widget.original_widget = urwid.Pile(self.info_widgets_list + self.file_widgets_list + self.metadata_widgets_list)
 
 
 class ClusterWidget(BaseTimedWidgetWrap):
