@@ -270,12 +270,13 @@ def expand(command):
         yield from expand_command(command)
 
 
-def generate(command, job_parameters, conda_env, easy_build_modules):
+def generate(command, job_parameters, conda_env=None, easy_build_modules=None):
     sections = collections.OrderedDict()
     if len(job_parameters) > 0:
         sections['params'] = jobs_file.stringify_parameters(job_parameters)
-    if len(conda_env) + len(easy_build_modules) > 0:
+    if easy_build_modules is not None and len(easy_build_modules) > 0:
         sections['pre'] = ['module load {}'.format(m) for m in easy_build_modules]
-        sections['pre'] += ['conda activate {}'.format(conda_env)]
+    if conda_env is not None:
+        sections['pre'] = sections.get('pre', []) + ['conda activate {}'.format(conda_env)]
     sections['jobs'] = expand(command)
     return jobs_file.stringify(sections)
