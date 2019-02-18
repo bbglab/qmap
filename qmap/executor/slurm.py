@@ -80,7 +80,7 @@ def parse_status(job_status):
         }
         mem = job_status['MaxVMSize']
         if len(mem) > 0 and mem[-1].isalpha():  # convert units to Gigas
-            mem = str(memory_convert(int(mem[:-1]), mem[-1], 'G')) + 'G'
+            mem = str(memory_convert(int(float(mem[:-1])), mem[-1], 'G')) + 'G'
         info['usage']['memory'] = mem
     info['usage']['time'] = job_status['Elapsed']
     info['usage']['cluster'] = {
@@ -257,7 +257,7 @@ class Executor(IExecutor):
                 cores_user += int(values[0])
                 mem = values[1]
                 mem_units = mem[-1]
-                mem_value = int(mem[:-1])
+                mem_value = int(float(mem[:-1]))
                 mem_user += memory_convert(mem_value, mem_units, 'G')
 
         data['user'] = get_usage_percentage(cores_user, mem_user, cores_total, mem_total)
