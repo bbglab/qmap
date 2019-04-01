@@ -16,6 +16,10 @@ from qmap.utils import copy_file, read_file
 NAME = 'qmap_input'
 
 
+def _get_name_fmt(n_commands):
+    return '{{:0{}d}}'.format(len(str(n_commands - 1)))
+
+
 def get(folder):
     """Find qmap input file in a folder"""
     cmds_file = path.join(folder, NAME)
@@ -77,8 +81,9 @@ def filter_commands(folder, status_to_filter, only_jobs=False):
 
     commands = sections['jobs']
     commands_searched_for = []
+    fmt = _get_name_fmt(len(commands))
     for index, cmd in enumerate(commands[pos:pos + group_size] for pos in range(0, len(commands), group_size)):
-        metadata = metadata_file.load(path.join(folder, '{}'.format(index*group_size)))
+        metadata = metadata_file.load(path.join(folder, fmt.format(index*group_size)))
         if metadata[Job.MD_STATUS] in status_to_filter:  # filter by status
             commands_searched_for += cmd
 
@@ -125,6 +130,6 @@ def parse(file):
     post_commands = sections.get('post', [])
     params = Parameters(_parse_parameters(sections.get('params', [])))
     cmds = sections.get('jobs', [])
-    fmt = '{{:0{}d}}'.format(len(str(len(cmds)-1)))
+    fmt = _get_name_fmt(len(cmds))
     commands = collections.OrderedDict([(fmt.format(i), c.replace('${LINE}', fmt.format(i))) for i, c in enumerate(cmds)])
     return pre_commands, commands, post_commands, params
