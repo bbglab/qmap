@@ -42,7 +42,8 @@ class Profile(dict):
             builtin_profiles_dir = path.join(path.dirname(__file__), 'executor', 'profiles')
             default_configuration = BGConfig(path.join(builtin_profiles_dir, 'default.conf'),
                                              config_spec=path.join(builtin_profiles_dir, 'profile.conf.spec'),
-                                             config_namespace=CONFIGURATION_NAMESPACE)
+                                             config_namespace=CONFIGURATION_NAMESPACE,
+                                             use_bgdata=False, use_env_vars=False)
             self.update(default_configuration)
             if name is None:  # default
                 profile_configuration = {'executor': 'local', 'editable_params': {}}
@@ -51,11 +52,13 @@ class Profile(dict):
             elif path.exists(path.join(builtin_profiles_dir, '{}.conf'.format(name))):  # it is a built-in profile
                 profile_configuration = BGConfig(path.join(builtin_profiles_dir, '{}.conf'.format(name)),
                                                  config_spec=path.join(builtin_profiles_dir, 'profile.conf.spec'),
-                                                 config_namespace=CONFIGURATION_NAMESPACE)
+                                                 config_namespace=CONFIGURATION_NAMESPACE,
+                                                 use_bgdata=False, use_env_vars=False)
             else:  # search for the name in the config folder
                 profile_configuration = BGConfig(None, config_name=name,
                                                  config_spec=path.join(builtin_profiles_dir, 'profile.conf.spec'),
-                                                 build_hook=_bgconfig_build_hook)
+                                                 build_hook=_bgconfig_build_hook,
+                                                 use_bgdata=False, use_env_vars=False)
             self.update(profile_configuration)
         self._validate()
         executor.load(self['executor'], self.get('show_usage', False))
