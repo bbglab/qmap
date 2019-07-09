@@ -3,6 +3,8 @@ SLURM cluster executor.
 """
 
 import csv
+import os
+import stat
 import subprocess
 import sys
 import time
@@ -200,7 +202,8 @@ class Executor(IExecutor):
 
     @staticmethod
     def create_script(file, commands, default_params_file, specific_params_file):
-        with open('{}.{}'.format(file, SCRIPT_FILE_EXTENSION), "wt") as fd:
+        file = '{}.{}'.format(file, SCRIPT_FILE_EXTENSION)
+        with open(file, "wt") as fd:
             fd.writelines([
                 "#!/bin/bash\n",
                 '#SBATCH --no-requeue\n'
@@ -214,6 +217,7 @@ class Executor(IExecutor):
                 "{}\n".format('\n'.join(commands)),
                 "\n"
             ])
+        os.chmod(file, os.stat(file).st_mode | stat.S_IXUSR)
 
     @staticmethod
     def get_usage():

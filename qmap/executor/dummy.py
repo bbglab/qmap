@@ -1,8 +1,9 @@
 """
 Executor for test that does not do anything
 """
-
+import os
 import random
+import stat
 import time
 
 from qmap.executor.executor import ExecutorErrorCodes, IExecutor
@@ -52,7 +53,8 @@ class Executor(IExecutor):
 
     @staticmethod
     def create_script(file, commands, default_params_file, specific_params_file):
-        with open('{}.{}'.format(file, SCRIPT_FILE_EXTENSION), "wt") as fd:
+        file = '{}.{}'.format(file, SCRIPT_FILE_EXTENSION)
+        with open(file, "wt") as fd:
             fd.writelines([
                 "#!/bin/bash\n",
                 'set -e\n',
@@ -65,6 +67,7 @@ class Executor(IExecutor):
                 "{}\n".format('\n'.join(commands)),
                 "\n"
             ])
+        os.chmod(file, os.stat(file).st_mode | stat.S_IXUSR)
 
     @staticmethod
     def get_usage():
