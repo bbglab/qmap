@@ -13,6 +13,7 @@ def cpu_intensive_task(cpus):
         print('Using {} cores'.format(i))
         pool = Pool(i)
         pool.map(f, range(i))
+        pool.close()
 
 
 if __name__ == '__main__':
