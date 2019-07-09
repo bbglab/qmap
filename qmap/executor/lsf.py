@@ -170,7 +170,8 @@ class Executor(IExecutor):
         """
         ids = [v for v in job_ids]
         yield from Executor.generate_job_status_running(ids, retries=retries)
-        yield from Executor.generate_job_status_finished(ids, retries=retries)
+        if len(ids) > 0:  # only if there are jobs left
+            yield from Executor.generate_job_status_finished(ids, retries=retries)
 
     @staticmethod
     def terminate_jobs(job_ids):
