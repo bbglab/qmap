@@ -151,7 +151,8 @@ def run(cores, memory, profile, quiet, cmd):
 @click.option('--time', '-t', 'wall_time', default=None, help='Wall time (default in h)')
 @click.option('--conda-env', default=None, envvar='CONDA_DEFAULT_ENV', help='Conda environment. Default: current environment')
 @click.option('--module', 'easy_build_modules', envvar='LOADEDMODULES', multiple=True, type=click.Path(), default=None, help='Easy build modules. Default: current loaded modules')
-def template(command, output, cores, memory, wall_time, conda_env, easy_build_modules):
+@click.option('--base', '-b', default=None, envvar='QMAP_TEMPLATE_BASE', type=click.Path(), required=False, help='File to be used as base')
+def template(command, output, cores, memory, wall_time, base, conda_env, easy_build_modules):
     """
     Create a jobs file for execution with qmap. The <CMD> can a single command string or
     a file with multiple commands.
@@ -185,7 +186,7 @@ def template(command, output, cores, memory, wall_time, conda_env, easy_build_mo
             wall_time += 'h'
         params['time'] = wall_time
 
-    write(output, mtemplate.generate(command, JobParameters(params), conda_env, easy_build_modules))
+    write(output, mtemplate.generate(command, JobParameters(params), base, conda_env, easy_build_modules))
 
 
 @cli.command(short_help='Get information from the .info files')

@@ -270,13 +270,32 @@ def expand(command):
         yield from expand_command(command)
 
 
-def generate(command, job_parameters, conda_env=None, easy_build_modules=None):
-    sections = collections.OrderedDict()
-    if len(job_parameters) > 0:
-        sections['params'] = jobs_file.stringify_parameters(job_parameters)
+class Template(collections.OrderedDict):
+
+    def __init__(self, jobs, job_parameters, pre_commands, base=None):
+        super().__init__()
+
+        pre, _, post, params = jobs_file.parse(base) if base is not None else ([], None, [], {})
+
+        params.update(job_parameters)
+        if len(params) > 0:
+            self['params'] = jobs_file.stringify_parameters(params)
+
+        pre += pre_commands
+        if len(pre) > 0:
+            self['pre'] = pre
+
+        if len(post) > 0:
+            self['post'] = post
+
+        self['jobs'] = jobs
+
+
+def generate(command, job_parameters, base_template=None, conda_env=None, easy_build_modules=None):
+    pre_commands = []
     if easy_build_modules is not None and len(easy_build_modules) > 0:
-        sections['pre'] = ['module load {}'.format(m) for m in easy_build_modules]
+        pre_commands += ['module load {}'.format(m) for m in easy_build_modules]
     if conda_env is not None:
-        sections['pre'] = sections.get('pre', []) + ['conda activate {}'.format(conda_env)]
-    sections['jobs'] = expand(command)
+        pre_commands += ['conda activate {}'.format(conda_env)]
+    sections = Template(expand(command), job_parameters, base=base_template, pre_commands=pre_commands)
     return jobs_file.stringify(sections)
