@@ -181,12 +181,12 @@ class Executor(IExecutor):
                 if prev_id == job_id:
                     info.append(line)
                 else:
-                    yield prev_id, parse_status(info[-1])  # get latest line of previous job
+                    yield prev_id, parse_status(info[0])  # get first line of previous job
                     prev_id = job_id
                     info = [line]
             else:
                 if prev_id is not None:
-                    yield prev_id, parse_status(info[-1])
+                    yield prev_id, parse_status(info[0])
 
     @staticmethod
     def terminate_jobs(job_ids):
