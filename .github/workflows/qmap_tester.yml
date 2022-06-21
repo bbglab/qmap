@@ -36,6 +36,12 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        for testfile in `find test/ -name test*.py` do
-          pytest $testfile
-        done
+        pytest test/test_manager_reattached.py
+        pytest test/file/test_metadata.py
+        pytest test/file/test_job.py
+        pytest test/test_manager_submitted.py
+        pytest test/test_template.py
+        pytest test/job/test_status.py
+        pytest test/job/test_parameters.py
+        pytest test/test_manager.py
+        pytest test/test_profile.py
