@@ -21,7 +21,7 @@ STATUS_FORMAT = ",".join(['jobid', 'state',
                           'timelimit',
                           'maxdiskread', 'maxdiskwrite',
                           'maxvmsize',
-                          'reqcpus', 'reqmem', 'reserved',
+                          'reqcpus', 'reqmem',
                           'nodelist', 'exitcode'])
 
 SLURM_STATUS_CONVERSION = {Status.DONE: ['COMPLETED', 'CD'],
