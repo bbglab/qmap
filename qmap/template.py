@@ -49,12 +49,12 @@ Split the command by any space that is not preceded by '\'
 """
 
 
-glob_wildcards_regex = re.compile('\*|\*\*')
+glob_wildcards_regex = re.compile(r'\*|\*\*')
 """
 Glob wildcards: *, **
 """
 
-glob_user_wildcards_regex = re.compile('{{(?:\?(?P<name>.+?):)(?P<wildcard>\*|\*\*)}}')
+glob_user_wildcards_regex = re.compile(r'{{(?:\?(?P<name>.+?):)(?P<wildcard>\*|\*\*)}}')
 """
 Glob wildcards within a user named group
 e.g. {{?name:*}}
@@ -80,7 +80,7 @@ def check_command(cmd):
     """
     # check for groups with same name
     group_names = []
-    for match in re.finditer('{{\?(?P<name>(?!=).+?):(?P<value>.*?)}}', cmd):  # user named groups: {{?name:value}}
+    for match in re.finditer(r'{{\?(?P<name>(?!=).+?):(?P<value>.*?)}}', cmd):  # user named groups: {{?name:value}}
         value = match.group('value')
         if value is None:
             raise TemplateError('Empty wildcard value {}'.format(value))
@@ -93,7 +93,7 @@ def check_command(cmd):
             raise TemplateError('Repeated name {} in command'.format(name))
         else:
             group_names.append(name)
-    for match in re.finditer('{{\?=(?P<name>.+?)}}', cmd):  # user groups replacements: {{?=name}}
+    for match in re.finditer(r'{{\?=(?P<name>.+?)}}', cmd):  # user groups replacements: {{?=name}}
         name = match.group('name')
         if name not in group_names:
             raise TemplateError('Missing group {} in command'.format(name))
@@ -118,7 +118,7 @@ def expand_substitutions(cmd):
 
     expanded_cmd = cmd[:]
     expansion_dict = {}
-    for group_count, user_group in enumerate(re.finditer('{{(\?(?P<name>[^}]+?):)?(?P<value>.+?)}}', cmd)):
+    for group_count, user_group in enumerate(re.finditer(r'{{(\?(?P<name>[^}]+?):)?(?P<value>.+?)}}', cmd)):
         # Loop through each user defined groups (named and unnamed): {{user group}}
 
         group_str = user_group.group(0)
@@ -166,7 +166,7 @@ def expand_wildcards(cmd):
 
     """
     # Replace all glob wildcards between {{...}} that are unnamed
-    command = re.sub('{{(?P<wildcard>\*|\*\*)}}', '\g<wildcard>', cmd)  # treat user unamed glob wildcards (e.g. {{*}}) as normal globl wildcards (e.g. /home/{{*}}.txt == /home/*.txt)
+    command = re.sub(r'{{(?P<wildcard>\*|\*\*)}}', r'\g<wildcard>', cmd)  # treat user unamed glob wildcards (e.g. {{*}}) as normal globl wildcards (e.g. /home/{{*}}.txt == /home/*.txt)
     cmd_str_list = []
     expansion_dict = {}
     for s in split_regex.split(command):  # glob wildcards are expanded as we split the command
@@ -205,16 +205,16 @@ def expand_glob_magic(command):
         # Expand next (look at the break) part of the command with a user named group glob wildcard
         for index, cmd in enumerate(stripped_cmd):
             if glob_user_wildcards_regex.search(cmd):  # first item with the named wildcard
-                glob_search_str = glob_user_wildcards_regex.sub('\g<wildcard>', cmd)
+                glob_search_str = glob_user_wildcards_regex.sub(r'\g<wildcard>', cmd)
 
-                escaped_cmd = cmd.replace('.', '\.')  # TODO escape rest of metacharacters
+                escaped_cmd = cmd.replace('.', r'\.')  # TODO escape rest of metacharacters
                 # replace all glob wildcards that do not belong to a named group. They cannot be preceded by '\', '{{' or followed by '}}'
 
                 regex_str = re.sub(r'(?<!\\)(?<!{{)(?P<wildcard>\*)(?!\*|}})', '.*?', escaped_cmd)
                 regex_str = re.sub(r'(?<!\\)(?<!{{)(?P<wildcard>\*\*/?)(?!}})', '(.*?)?', regex_str)
                 # give a name to named wildcards
-                regex_str = re.sub('{{(?:\?(?P<name>.+?):)(?P<regex>\*\*)}}/?', '(?P<\g<name>>.*?)?', regex_str)
-                regex_str = re.sub('{{(?:\?(?P<name>.+?):)(?P<regex>\*)}}', '(?P<\g<name>>.*?)', regex_str)
+                regex_str = re.sub(r'{{(?:\?(?P<name>.+?):)(?P<regex>\*\*)}}/?', r'(?P<\g<name>>.*?)?', regex_str)
+                regex_str = re.sub(r'{{(?:\?(?P<name>.+?):)(?P<regex>\*)}}', r'(?P<\g<name>>.*?)', regex_str)
                 if regex_str.endswith('.*?)'):
                     regex_str = regex_str[:-2] + '$)'
                 elif regex_str.endswith('.*?'):

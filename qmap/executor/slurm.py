@@ -115,31 +115,31 @@ def parse_parameters(parameters):
     """Parse job parameters into SLURM command options"""
     options = []
     if 'nodes' in parameters:
-        options.append(f'-N {parameters['nodes']}')  # Number of nodes    -N=1 -> One node (all cores in same machine)
+        options.append(f'-N {parameters["nodes"]}')  # Number of nodes    -N=1 -> One node (all cores in same machine)
     if 'tasks' in parameters:
-        options.append(f'-n {parameters['tasks']}')  # Number of cores
+        options.append(f'-n {parameters["tasks"]}')  # Number of cores
     if 'cores' in parameters:
-        options.append(f'-c {parameters['cores']}')  # Cores per task
+        options.append(f'-c {parameters["cores"]}')  # Cores per task
     if 'memory' in parameters:
-        options.append(f'--mem {parameters['memory']}')  # Memory pool for all cores (see also --mem-per-cpu)
+        options.append(f'--mem {parameters["memory"]}')  # Memory pool for all cores (see also --mem-per-cpu)
     if 'queue' in parameters:
-        options.append(f'-p {parameters['queue']}')  # Partition(s) to submit to
+        options.append(f'-p {parameters["queue"]}')  # Partition(s) to submit to
     if 'time' in parameters:
-        wall_time = convert_time(parameters['time'])
+        wall_time = convert_time(parameters["time"])
         options.append(f'-t {wall_time}')  # Runtime
     if 'working_directory' in parameters:
-        options.append(f'-D {parameters['working_directory']}')
+        options.append(f'-D {parameters["working_directory"]}')
     if 'name' in parameters:
-        options.append(f'-J {parameters['name']}')
+        options.append(f'-J {parameters["name"]}')
     if 'extra' in parameters:
-        options.append(f'{parameters['extra']}')
+        options.append(f'{parameters["extra"]}')
     return options
 
 
 class Executor(IExecutor):
 
     @staticmethod
-    def _get_slurm_version_major() -> str:
+    def _get_slurm_version_major() -> int:
         """
         Fetch the SLURM version from the user's infrastructure.
         """
@@ -176,7 +176,7 @@ class Executor(IExecutor):
 
         status_fmt = STATUS_FORMAT.replace('<placeholder>', node_state_column)
 
-        cmd = f"sacct --parsable2 --format {status_fmt} --jobs {",".join(job_ids)}"
+        cmd = f"sacct --parsable2 --format {status_fmt} --jobs {','.join(job_ids)}"
         try:
             out = execute_command(cmd)
         except QMapError as e:
@@ -207,7 +207,7 @@ class Executor(IExecutor):
 
     @staticmethod
     def terminate_jobs(job_ids):
-        cmd = f"scancel -f {" ".join(job_ids)}"
+        cmd = f"scancel -f {' '.join(job_ids)}"
         if len(job_ids) == 0:
             return '', cmd
         try:
