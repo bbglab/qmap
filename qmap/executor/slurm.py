@@ -15,7 +15,6 @@ from qmap.job.parameters import memory_convert
 from qmap.job.status import Status
 from qmap.utils import execute_command
 
-
 STATUS_FORMAT = ",".join(['jobid', 'state',
                           'avecpu', 'cputime', 'elapsed', 'start', 'end',
                           'timelimit',
@@ -42,7 +41,7 @@ for k, v in SLURM_STATUS_CONVERSION.items():
 
 USAGE_FORMAT = ','.join(['nodelist', 'cpusstate', 'memory', 'allocmem', 'statecompact'])
 
-CMD_INFO = "sinfo -N -O {} --noheader".format(USAGE_FORMAT)
+CMD_INFO = f"sinfo -N -O {USAGE_FORMAT} --noheader"
 
 CMD_SQUEUE = 'squeue -u ${USER} -t R -o "%C %m %N" --noheader'
 
@@ -99,15 +98,15 @@ def convert_time(time_):
         t = time_[:-1]
         units = time_[-1]
         if units == 'd':
-            return '{}-0'.format(t)
+            return f'{t}-0'
         elif units == 'h':
-            return '0-{}'.format(t)
+            return f'0-{t}'
         elif units == 'm':
-            return '{}'.format(t)
+            return f'{t}'
         elif units == 's':
-            return '0:{}'.format(t)
+            return f'0:{t}'
         else:
-            raise ExecutorError('Invalid units for time: {}'.format(units))
+            raise ExecutorError(f'Invalid units for time: {units}')
     else:
         return time_
 
@@ -116,24 +115,24 @@ def parse_parameters(parameters):
     """Parse job parameters into SLURM command options"""
     options = []
     if 'nodes' in parameters:
-        options.append('-N {}'.format(parameters['nodes']))  # Number of nodes    -N=1 -> One node (all cores in same machine)
+        options.append(f'-N {parameters['nodes']}')  # Number of nodes    -N=1 -> One node (all cores in same machine)
     if 'tasks' in parameters:
-        options.append('-n {}'.format(parameters['tasks']))  # Number of cores
+        options.append(f'-n {parameters['tasks']}')  # Number of cores
     if 'cores' in parameters:
-        options.append('-c {}'.format(parameters['cores']))  # Cores per task
+        options.append(f'-c {parameters['cores']}')  # Cores per task
     if 'memory' in parameters:
-        options.append('--mem {}'.format(parameters['memory']))  # Memory pool for all cores (see also --mem-per-cpu)
+        options.append(f'--mem {parameters['memory']}')  # Memory pool for all cores (see also --mem-per-cpu)
     if 'queue' in parameters:
-        options.append('-p {}'.format(parameters['queue']))  # Partition(s) to submit to
+        options.append(f'-p {parameters['queue']}')  # Partition(s) to submit to
     if 'time' in parameters:
         wall_time = convert_time(parameters['time'])
-        options.append('-t {}'.format(wall_time))  # Runtime
+        options.append(f'-t {wall_time}')  # Runtime
     if 'working_directory' in parameters:
-        options.append('-D {}'.format(parameters['working_directory']))
+        options.append(f'-D {parameters['working_directory']}')
     if 'name' in parameters:
-        options.append('-J {}'.format(parameters['name']))
+        options.append(f'-J {parameters['name']}')
     if 'extra' in parameters:
-        options.append('{}'.format(parameters['extra']))
+        options.append(f'{parameters['extra']}')
     return options
 
 
@@ -152,15 +151,18 @@ class Executor(IExecutor):
         except subprocess.CalledProcessError as e:
             raise ExecutorError(f"Failed to retrieve SLURM version: {e}") from e
 
+    @staticmethod
+    def run_job(f_script, job_parameters, out=None, err=None):
+        options = parse_parameters(job_parameters)
         if out is not None:
-            options.append('-o {}'.format(out))  # File to which STDOUT will be written
+            options.append(f'-o {out}')  # File to which STDOUT will be written
         if err is not None:
-            options.append('-e {}'.format(err))  # File to which STDERR will be written
-        cmd = "sbatch --parsable {} {}.{}".format(' '.join(options), f_script, SCRIPT_FILE_EXTENSION)
+            options.append(f'-e {err}')  # File to which STDERR will be written
+        cmd = f"sbatch --parsable {' '.join(options)} {f_script}.{SCRIPT_FILE_EXTENSION}"
         try:
             out = execute_command(cmd)
-        except QMapError:
-            raise ExecutorError('Job cannot be submitted to slurm. Command: {}'.format(cmd))
+        except QMapError as e:
+            raise ExecutorError(f'Job cannot be submitted to slurm. Command: {cmd}') from e
         return out.strip(), cmd
 
     @staticmethod
@@ -205,28 +207,28 @@ class Executor(IExecutor):
 
     @staticmethod
     def terminate_jobs(job_ids):
-        cmd = "scancel -f {}".format(" ".join(job_ids))
+        cmd = f"scancel -f {" ".join(job_ids)}"
         if len(job_ids) == 0:
             return '', cmd
         try:
             out = execute_command(cmd)
         except QMapError as e:
-            raise ExecutorError(e)
+            raise ExecutorError(e) from e
         else:
             return out.strip(), cmd
 
     @staticmethod
     def create_script(file, commands, default_params_file, specific_params_file):
-        file = '{}.{}'.format(file, SCRIPT_FILE_EXTENSION)
+        file = f'{file}.{SCRIPT_FILE_EXTENSION}'
         with open(file, "wt") as fd:
             fd.writelines([
                 "#!/bin/bash\n",
                 '#SBATCH --no-requeue\n'
                 'set -e\n',
                 "\n",
-                'source "{}"\n'.format(default_params_file),
-                'if [ -f "{}" ]; then\n'.format(specific_params_file),
-                '\tsource "{}"\n'.format(specific_params_file),
+                f'source "{default_params_file}"\n',
+                f'if [ -f "{specific_params_file}" ]; then\n',
+                f'\tsource "{specific_params_file}"\n',
                 'fi\n',
                 "\n",
                 "{}\n".format('\n'.join(commands)),
@@ -246,12 +248,12 @@ class Executor(IExecutor):
         try:
             out = execute_command(CMD_INFO)
         except QMapError as e:
-            raise ExecutorError(e)
+            raise ExecutorError(e) from e
         else:
             lines = out.splitlines()
             for line in lines:
                 values = line.strip().split()
-                node_id = values[0]
+                _node_id = values[0]
                 all_cores = values[1].split('/')
                 cores_total += int(all_cores[3])
                 cores_alloc += int(all_cores[0])
@@ -268,7 +270,7 @@ class Executor(IExecutor):
         try:
             out = execute_command(CMD_SQUEUE)
         except QMapError as e:
-            raise ExecutorError(e)
+            raise ExecutorError(e) from e
         else:
             lines = out.splitlines()
             for line in lines:
@@ -298,7 +300,7 @@ class Executor(IExecutor):
                 # Skip error lines due to --pty option
                 pass
             else:
-                if quiet and line in ('salloc: Granted job allocation {}\n'.format(job_id), 'salloc: Relinquishing job allocation {}\n'.format(job_id)):
+                if quiet and line in (f'salloc: Granted job allocation {job_id}\n', f'salloc: Relinquishing job allocation {job_id}\n'):
                     pass
                 else:
                     print(line, end='')
