@@ -22,6 +22,7 @@ STATUS_FORMAT = ",".join(['jobid', 'state',
                           'maxdiskread', 'maxdiskwrite',
                           'maxvmsize',
                           'reqcpus', 'reqmem',
+                          '<placeholder>',
                           'nodelist', 'exitcode'])
 
 SLURM_STATUS_CONVERSION = {Status.DONE: ['COMPLETED', 'CD'],
@@ -139,8 +140,18 @@ def parse_parameters(parameters):
 class Executor(IExecutor):
 
     @staticmethod
-    def run_job(f_script, parameters, out=None, err=None):
-        options = parse_parameters(parameters)
+    def _get_slurm_version_major() -> str:
+        """
+        Fetch the SLURM version from the user's infrastructure.
+        """
+        try:
+            result = subprocess.run(['scontrol', '--version'], capture_output=True, text=True, check=True)
+            version_line = result.stdout.strip()
+            version = version_line.split()[1]  # Extract version from "slurm x.x.x"
+            return int(version.split('.')[0])
+        except subprocess.CalledProcessError as e:
+            raise ExecutorError(f"Failed to retrieve SLURM version: {e}") from e
+
         if out is not None:
             options.append('-o {}'.format(out))  # File to which STDOUT will be written
         if err is not None:
@@ -158,8 +169,12 @@ class Executor(IExecutor):
         For each job ID,
         we assume we have a single step (.0 for run and .batch for batch submissions).
         """
+        major_version = Executor._get_slurm_version_major()
+        node_state_column = 'reserved' if major_version < 21 else 'planned'
 
-        cmd = "sacct --parsable2 --format {} --jobs {}".format(STATUS_FORMAT, ",".join(job_ids))
+        status_fmt = STATUS_FORMAT.replace('<placeholder>', node_state_column)
+
+        cmd = f"sacct --parsable2 --format {status_fmt} --jobs {",".join(job_ids)}"
         try:
             out = execute_command(cmd)
         except QMapError as e:
