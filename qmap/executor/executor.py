@@ -101,7 +101,7 @@ class IExecutor:
         """
         Create the script to execute from a list of commands
 
-        Args: 
+        Args:
             file (str): path to the file (without extension)
             commands (list): list of commands to execute for the job
             default_params_file (path): path to the env file with default jobs parameters

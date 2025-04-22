@@ -75,5 +75,5 @@ class Executor(IExecutor):
 
     @staticmethod
     def run(cmd, parameters, quiet=False):
-        time.sleep(random.randint(0,100))
+        time.sleep(random.randint(0, 100))
         pass
